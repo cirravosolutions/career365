@@ -10,13 +10,8 @@ import ManageAdminsPage from './components/ManageAdminsPage';
 import AdminDashboard from './components/AdminDashboard';
 import ManageStudentsPage from './components/ManageStudentsPage';
 import DriveInterestDetails from './components/DriveInterestDetails';
-import { DrivePost, AnnouncementPost, AlumniPost } from './types';
+import { DrivePost } from './types';
 import Spinner from './components/Spinner';
-import CreateAnnouncementModal from './components/CreateAnnouncementModal';
-import ContactAdmin from './components/ContactAdmin';
-import AboutUsPage from './components/AboutUsPage';
-import AlumniPage from './components/AlumniPage';
-import CreateAlumniModal from './components/CreateAlumniModal';
 
 type Theme = 'light' | 'dark';
 
@@ -27,16 +22,7 @@ const App: React.FC = () => {
   const [editingDrive, setEditingDrive] = useState<DrivePost | null>(null);
   const [refreshFeed, setRefreshFeed] = useState(false);
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('theme') as Theme) || 'light');
-  
-  const registrationUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSd6l0-y2GIXT9fQUV04ZKMO6TBIvwoAQ__oZ9xO2hVKvADbZw/viewform?usp=sharing&ouid=115934251216838098785';
-
-  const [isAnnouncementModalOpen, setAnnouncementModalOpen] = useState(false);
-  const [editingAnnouncement, setEditingAnnouncement] = useState<AnnouncementPost | null>(null);
-  const [refreshAnnouncements, setRefreshAnnouncements] = useState(false);
-
-  const [isAlumniModalOpen, setAlumniModalOpen] = useState(false);
-  const [editingAlumni, setEditingAlumni] = useState<AlumniPost | null>(null);
-  const [refreshAlumni, setRefreshAlumni] = useState(false);
+  const registrationUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSd6l0-y2GIXT9fQUV04ZKMO6TBIvwoAQ__oZ9xO2hVKvADbZw/viewform?usp=header';
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -67,33 +53,7 @@ const App: React.FC = () => {
     window.open(registrationUrl, '_blank', 'noopener,noreferrer');
   };
 
-  const handleAnnouncementSubmitted = () => {
-    setAnnouncementModalOpen(false);
-    setEditingAnnouncement(null);
-    setRefreshAnnouncements(prev => !prev);
-  };
-
-  const handleEditAnnouncementClick = (announcement: AnnouncementPost) => {
-      setEditingAnnouncement(announcement);
-      setAnnouncementModalOpen(true);
-  };
-
-  const handleAlumniSubmitted = () => {
-    setAlumniModalOpen(false);
-    setEditingAlumni(null);
-    setRefreshAlumni(prev => !prev);
-  };
-  
-  const handleAddAlumniClick = () => {
-      setEditingAlumni(null);
-      setAlumniModalOpen(true);
-  };
-
-  const handleEditAlumniClick = (alumni: AlumniPost) => {
-      setEditingAlumni(alumni);
-      setAlumniModalOpen(true);
-  };
-
+  // Show a global spinner while checking the user's session
   if (isLoading) {
     return (
       <div className="min-h-screen flex justify-center items-center bg-background dark:bg-dark-background">
@@ -111,19 +71,10 @@ const App: React.FC = () => {
         />
         <main className="container mx-auto p-4 md:p-8 max-w-6xl flex-grow">
           <Routes>
-            <Route path="/about" element={<AboutUsPage />} />
-            <Route 
-                path="/alumni" 
-                element={<AlumniPage 
-                    key={refreshAlumni ? 'refresh' : 'initial'}
-                    onAdd={handleAddAlumniClick} 
-                    onEdit={handleEditAlumniClick}
-                />} 
-            />
             {isLoggedIn ? (
               <>
-                <Route path="/" element={<DriveFeed key={refreshFeed ? 'refresh' : 'initial'} onEdit={handleEditClick} onEditAnnouncement={handleEditAnnouncementClick} refreshAnnouncements={refreshAnnouncements} />} />
-                <Route path="/admin" element={isAdmin ? <AdminDashboard onCreatePostClick={() => { setEditingDrive(null); setPostModalOpen(true); }} onCreateAnnouncementClick={() => { setEditingAnnouncement(null); setAnnouncementModalOpen(true); }} /> : <Navigate to="/" replace />} />
+                <Route path="/" element={<DriveFeed key={refreshFeed ? 'refresh' : 'initial'} onEdit={handleEditClick} />} />
+                <Route path="/admin" element={isAdmin ? <AdminDashboard onCreatePostClick={() => setPostModalOpen(true)} /> : <Navigate to="/" replace />} />
                 <Route path="/manage-admins" element={isSuperAdmin ? <ManageAdminsPage /> : <Navigate to="/" replace />} />
                 <Route path="/manage-students" element={isAdmin ? <ManageStudentsPage /> : <Navigate to="/" replace />} />
                 <Route path="/drive/:driveId/attendees" element={isAdmin ? <DriveInterestDetails /> : <Navigate to="/" replace />} />
@@ -140,12 +91,9 @@ const App: React.FC = () => {
         <LoginModal 
           isOpen={isLoginModalOpen} 
           onClose={() => setLoginModalOpen(false)} 
-          onRegisterClick={() => {
-            setLoginModalOpen(false);
-            handleRegisterClick();
-          }}
+          onRegisterClick={handleRegisterClick}
         />
-        {isLoggedIn && isAdmin && (
+        {isLoggedIn && (
           <CreatePostModal
             isOpen={isPostModalOpen}
             onClose={() => {
@@ -156,35 +104,8 @@ const App: React.FC = () => {
             driveToEdit={editingDrive}
           />
         )}
-        {isLoggedIn && isAdmin && (
-          <CreateAnnouncementModal
-              isOpen={isAnnouncementModalOpen}
-              onClose={() => {
-                  setAnnouncementModalOpen(false);
-                  setEditingAnnouncement(null);
-              }}
-              onSubmitted={handleAnnouncementSubmitted}
-              announcementToEdit={editingAnnouncement}
-          />
-        )}
-        {isLoggedIn && isAdmin && (
-          <CreateAlumniModal
-            isOpen={isAlumniModalOpen}
-            onClose={() => {
-              setAlumniModalOpen(false);
-              setEditingAlumni(null);
-            }}
-            onSubmitted={handleAlumniSubmitted}
-            alumniToEdit={editingAlumni}
-          />
-        )}
-        <footer className="bg-surface dark:bg-dark-surface mt-auto">
-          <div className="container mx-auto px-4 md:px-8 py-6 flex flex-col md:flex-row justify-between items-center gap-6">
-            <ContactAdmin />
-            <p className="text-[11px] sm:text-xs text-text-secondary dark:text-dark-text-secondary">
-              All copyrights reserved to Cirravo
-            </p>
-          </div>
+        <footer className="text-center py-4 text-xs text-text-secondary dark:text-dark-text-secondary">
+          Powered by - Cirravo Solutions
         </footer>
       </div>
   );

@@ -7,16 +7,14 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbxBoSVLUmrZI3LjJnvZsvmi
 // IMPORTANT: This key MUST match the secret key in your Google Apps Script.
 const SECRET_KEY: string = 'My-Pl@cement-Drive-Hub-Key-2024!';
 
-// FIX: Added 'name' property to admin user mocks to match the User type.
 const mockAdminsWithPasswords = [
-  { id: '101', name: 'Sunflower Admin', username: 'sunflower', password: 'sunflower@123', role: UserRole.ADMIN },
-  { id: '102', name: 'Super Admin', username: 'csjjpfp', password: 'yadavGIRI@4153', role: UserRole.SUPER_ADMIN },
+  { id: '101', username: 'sunflower', password: 'sunflower@123', role: UserRole.ADMIN },
+  { id: '102', username: 'csjjpfp', password: 'yadavGIRI@4153', role: UserRole.SUPER_ADMIN },
 ];
 
 // In-memory store for new users. In a real app, this would be a database.
-// FIX: Added 'name' property to student user mock to match the User type.
 const mockStudentsWithPasswords = [
-    { id: '201', name: 'Student User', username: 'student', password: 'password', role: UserRole.STUDENT, subscriptionTier: SubscriptionTier.PREMIUM }
+    { id: '201', username: 'student', password: 'password', role: UserRole.STUDENT, subscriptionTier: SubscriptionTier.PREMIUM }
 ];
 // --- END CONFIGURATION ---
 
@@ -109,11 +107,9 @@ export const register = async (username: string, password: string): Promise<User
       throw new Error('Username already exists');
     }
   
-    // FIX: Added 'name' property to the new user object to match the User type.
     const newUser = {
       id: String(Date.now()), // Simple unique ID for mock user
       username,
-      name: username, // Default name to username
       password,
       role: UserRole.STUDENT,
       subscriptionTier: SubscriptionTier.FREE,

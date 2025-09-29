@@ -56,23 +56,14 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, theme, toggleTheme }) => 
   return (
     <header className="bg-surface dark:bg-dark-surface shadow-md sticky top-0 z-50">
       <div className="container mx-auto px-4 md:px-8 py-4 flex justify-between items-center">
-        <div className="cursor-pointer" onClick={() => navigate('/')}>
-          <div className="text-lg sm:text-xl md:text-2xl font-bold text-primary">
-            Career365
-          </div>
-          <p className="text-xs text-text-secondary dark:text-dark-text-secondary -mt-1 hidden sm:block">Build Your Dreams With Us</p>
+        <div className="text-xl md:text-2xl font-bold text-primary cursor-pointer" onClick={() => navigate('/')}>
+          Placement Drive Hub
         </div>
         <div className="flex items-center space-x-2 md:space-x-4">
-          {/* --- Desktop Nav Links --- */}
-          <div className="hidden md:flex items-center space-x-2">
-            <Button onClick={() => navigate('/about')} variant="secondary">About Us</Button>
-            <Button onClick={() => navigate('/alumni')} variant="secondary">Alumni</Button>
-          </div>
-
-          {/* --- Desktop Auth Buttons --- */}
-          <div className="hidden md:flex items-center space-x-4">
-            {isLoggedIn ? (
-              <>
+          {isLoggedIn ? (
+            <>
+              {/* Desktop View */}
+              <div className="hidden md:flex items-center space-x-4">
                 <span className="text-text-secondary dark:text-dark-text-secondary">
                   {getGreeting()} <span className="font-semibold">{user?.name}</span>
                 </span>
@@ -84,20 +75,32 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, theme, toggleTheme }) => 
                 <Button onClick={logout} variant="secondary">
                   Logout
                 </Button>
-              </>
-            ) : (
-              <button 
-                onClick={onLoginClick} 
-                className="p-2 rounded-full text-text-secondary hover:bg-gray-200 dark:text-dark-text-secondary dark:hover:bg-gray-700 transition-colors"
-                aria-label="Login / Register"
-                title="Login / Register"
-              >
-                <UserIcon />
-              </button>
-            )}
-          </div>
+              </div>
+
+              {/* Mobile Menu Button */}
+              <div className="md:hidden">
+                <button 
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  className="p-2 rounded-full text-text-secondary hover:bg-gray-200 dark:text-dark-text-secondary dark:hover:bg-gray-700 transition-colors"
+                  aria-label="Open menu"
+                >
+                  <MenuIcon />
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="flex items-center space-x-2">
+                <button 
+                  onClick={onLoginClick} 
+                  className="p-2 rounded-full text-text-secondary hover:bg-gray-200 dark:text-dark-text-secondary dark:hover:bg-gray-700 transition-colors"
+                  aria-label="Login / Register"
+                  title="Login / Register"
+                >
+                  <UserIcon />
+                </button>
+            </div>
+          )}
           
-          {/* --- Theme Toggle (Always visible) --- */}
           <button 
             onClick={toggleTheme} 
             className="p-2 rounded-full text-text-secondary hover:bg-gray-200 dark:text-dark-text-secondary dark:hover:bg-gray-700 transition-colors"
@@ -105,45 +108,22 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, theme, toggleTheme }) => 
           >
             {theme === 'light' ? <MoonIcon /> : <SunIcon />}
           </button>
-
-          {/* --- Mobile Menu Button (Always visible on mobile) --- */}
-          <div className="md:hidden">
-            <button 
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-full text-text-secondary hover:bg-gray-200 dark:text-dark-text-secondary dark:hover:bg-gray-700 transition-colors"
-              aria-label="Open menu"
-            >
-              <MenuIcon />
-            </button>
-          </div>
         </div>
       </div>
-       {/* --- Mobile Dropdown Menu --- */}
-      {isMenuOpen && (
+       {/* Mobile Dropdown Menu */}
+      {isMenuOpen && isLoggedIn && (
           <div className="md:hidden absolute top-full right-0 w-48 bg-surface dark:bg-dark-surface shadow-lg rounded-b-lg border-t border-gray-200 dark:border-gray-700 z-50">
-              {isLoggedIn ? (
-                <>
-                  <div className="p-2 border-b border-gray-200 dark:border-gray-700">
-                    <span className="text-text-secondary dark:text-dark-text-secondary text-sm">
-                      Signed in as <span className="font-semibold">{user?.name}</span>
-                    </span>
-                  </div>
-                  <ul className="py-1">
-                      <li><button onClick={() => handleMenuNavigation('/about')} className="w-full text-left px-4 py-2 text-sm text-text-primary dark:text-dark-text-primary hover:bg-gray-100 dark:hover:bg-gray-700">About Us</button></li>
-                      <li><button onClick={() => handleMenuNavigation('/alumni')} className="w-full text-left px-4 py-2 text-sm text-text-primary dark:text-dark-text-primary hover:bg-gray-100 dark:hover:bg-gray-700">Alumni</button></li>
-                      {isAdmin && (
-                        <li><button onClick={() => handleMenuNavigation('/admin')} className="w-full text-left px-4 py-2 text-sm text-text-primary dark:text-dark-text-primary hover:bg-gray-100 dark:hover:bg-gray-700">Admin Dashboard</button></li>
-                      )}
-                      <li><button onClick={() => handleMenuAction(logout)} className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20">Logout</button></li>
-                  </ul>
-                </>
-              ) : (
-                <ul className="py-1">
-                  <li><button onClick={() => handleMenuAction(onLoginClick)} className="w-full text-left px-4 py-2 text-sm text-text-primary dark:text-dark-text-primary hover:bg-gray-100 dark:hover:bg-gray-700">Login / Register</button></li>
-                  <li><button onClick={() => handleMenuNavigation('/about')} className="w-full text-left px-4 py-2 text-sm text-text-primary dark:text-dark-text-primary hover:bg-gray-100 dark:hover:bg-gray-700">About Us</button></li>
-                  <li><button onClick={() => handleMenuNavigation('/alumni')} className="w-full text-left px-4 py-2 text-sm text-text-primary dark:text-dark-text-primary hover:bg-gray-100 dark:hover:bg-gray-700">Alumni</button></li>
-                </ul>
-              )}
+              <div className="p-2 border-b border-gray-200 dark:border-gray-700">
+                <span className="text-text-secondary dark:text-dark-text-secondary text-sm">
+                  Signed in as <span className="font-semibold">{user?.name}</span>
+                </span>
+              </div>
+              <ul className="py-1">
+                  {isAdmin && (
+                    <li><button onClick={() => handleMenuNavigation('/admin')} className="w-full text-left px-4 py-2 text-sm text-text-primary dark:text-dark-text-primary hover:bg-gray-100 dark:hover:bg-gray-700">Admin Dashboard</button></li>
+                  )}
+                  <li><button onClick={() => handleMenuAction(logout)} className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20">Logout</button></li>
+              </ul>
           </div>
       )}
     </header>

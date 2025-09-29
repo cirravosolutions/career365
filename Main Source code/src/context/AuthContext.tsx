@@ -58,7 +58,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     await apiLogout();
     setUser(null);
     // Redirect to home on logout, ensuring a clean state
-    window.location.hash = '/';
+    window.location.hash = '/'; 
+    window.location.reload(); // Reload to clear any other state
   };
 
   // FIX: Implement the register function.

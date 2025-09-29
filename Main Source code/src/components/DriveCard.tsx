@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DrivePost, DriveInterest, UserRole } from '../types';
@@ -24,23 +23,6 @@ const InfoPill: React.FC<{ icon: React.ReactNode; text: string }> = ({ icon, tex
     <span className="ml-2">{text}</span>
   </div>
 );
-
-const formatDate = (dateString: string) => {
-    if (!dateString) return 'N/A';
-    try {
-        const date = new Date(dateString);
-        if (isNaN(date.getTime())) return 'Invalid Date';
-        // Use en-IN for consistency, UTC to avoid timezone shift on date-only strings
-        return date.toLocaleDateString('en-IN', {
-            timeZone: 'UTC',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-        });
-    } catch (e) {
-        return 'Invalid Date';
-    }
-};
 
 const DriveCard: React.FC<DriveCardProps> = ({ drive, onEdit, onDelete, userInterest, onInterestRegistered, interestCount = 0 }) => {
   const { user, isSuperAdmin, isAdmin, isLoggedIn } = useAuth();
@@ -93,7 +75,7 @@ const DriveCard: React.FC<DriveCardProps> = ({ drive, onEdit, onDelete, userInte
     // Footer
     doc.setTextColor(150, 150, 150);
     doc.setFontSize(10);
-    doc.text("Present this pass for verification. Powered by Career 365.", 105, 160, { align: "center" });
+    doc.text("Present this pass for verification. Powered by Placement Drive Hub.", 105, 160, { align: "center" });
 
     doc.save(`HallPass_${drive.companyName.replace(/\s/g, '')}_${user?.name.replace(/\s/g, '')}.pdf`);
   };
@@ -103,9 +85,11 @@ const DriveCard: React.FC<DriveCardProps> = ({ drive, onEdit, onDelete, userInte
     setIsRegistering(true);
     try {
       if (userInterest) {
+        // If already interested, just download the pass again
         generateAndDownloadPass(userInterest);
       } else {
-        const newInterest = await registerInterest(drive.id);
+        // Register interest and get the new pass details
+        const newInterest = await registerInterest(drive.id, user);
         onInterestRegistered(newInterest);
         generateAndDownloadPass(newInterest);
       }
@@ -117,34 +101,20 @@ const DriveCard: React.FC<DriveCardProps> = ({ drive, onEdit, onDelete, userInte
     }
   };
   
-  const formatToIST = (dateString: string) => {
-    if (!dateString) return 'N/A';
-    try {
-        // The server provides a timestamp that appears to be in a timezone
-        // that is 7 hours behind UTC (e.g., PDT), but without timezone info.
-        // We parse it as UTC and then add the 7-hour offset to correct it
-        // before formatting to Indian Standard Time.
-        const date = new Date(dateString.replace(' ', 'T') + 'Z');
-
-        // Add 7 hours to correct for the server's timezone offset
-        date.setHours(date.getHours() + 7);
-
-        if (isNaN(date.getTime())) {
-            return 'Invalid Date';
-        }
-        return date.toLocaleString('en-IN', {
-            timeZone: 'Asia/Kolkata',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true,
-        });
-    } catch (e) {
-        console.error("Failed to format date:", dateString, e);
-        return 'Invalid Date';
-    }
+  const timeSince = (dateString: string) => {
+    const date = new Date(dateString);
+    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+    let interval = seconds / 31536000;
+    if (interval > 1) return Math.floor(interval) + " years ago";
+    interval = seconds / 2592000;
+    if (interval > 1) return Math.floor(interval) + " months ago";
+    interval = seconds / 86400;
+    if (interval > 1) return Math.floor(interval) + " days ago";
+    interval = seconds / 3600;
+    if (interval > 1) return Math.floor(interval) + " hours ago";
+    interval = seconds / 60;
+    if (interval > 1) return Math.floor(interval) + " minutes ago";
+    return Math.floor(seconds) + " seconds ago";
   };
 
   return (
@@ -157,17 +127,17 @@ const DriveCard: React.FC<DriveCardProps> = ({ drive, onEdit, onDelete, userInte
       <div className="p-6">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between">
           <div className="mb-2 sm:mb-0">
-            <h2 className="text-lg md:text-xl font-bold text-primary">{drive.role}</h2>
-            <p className="text-base text-text-secondary dark:text-dark-text-secondary">{drive.companyName}</p>
+            <h2 className="text-xl md:text-2xl font-bold text-primary">{drive.role}</h2>
+            <p className="text-base md:text-lg text-text-secondary dark:text-dark-text-secondary">{drive.companyName}</p>
           </div>
           <div className="text-left sm:text-right flex-shrink-0">
              <div className="text-sm text-red-600 font-semibold">
-                Apply by: {formatDate(drive.applyDeadline)}
+                Apply by: {new Date(drive.applyDeadline).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
              </div>
           </div>
         </div>
         
-        <p className="mt-4 text-text-primary dark:text-dark-text-primary whitespace-pre-wrap">{drive.description}</p>
+        <p className="mt-4 text-text-primary dark:text-dark-text-primary">{drive.description}</p>
         
         <div className="mt-4">
           <h4 className="font-semibold text-text-primary dark:text-dark-text-primary">Eligibility:</h4>
@@ -215,7 +185,7 @@ const DriveCard: React.FC<DriveCardProps> = ({ drive, onEdit, onDelete, userInte
       </div>
       <div className="bg-gray-50 dark:bg-gray-900/50 px-6 py-3 flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
         <span>Posted by: {drive.postedBy}</span>
-        <span>{formatToIST(drive.postedAt)}</span>
+        <span>{timeSince(drive.postedAt)}</span>
       </div>
     </div>
   );

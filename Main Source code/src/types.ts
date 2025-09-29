@@ -4,8 +4,10 @@ export enum UserRole {
   SUPER_ADMIN = 'SUPER_ADMIN',
 }
 
+// Updated Subscription Tiers to a simple freemium model
 export enum SubscriptionTier {
   FREE = 'FREE',
+  // PREMIUM priced at ₹49
   PREMIUM = 'PREMIUM',
 }
 
@@ -24,7 +26,7 @@ export interface User {
 }
 
 export interface DrivePost {
-  id:string;
+  id: string;
   companyName: string;
   role: string;
   description: string;
@@ -46,26 +48,4 @@ export interface DriveInterest {
   driveId: string;
   userName: string;
   studentId: string;
-}
-
-export interface AnnouncementPost {
-  id: string;
-  title: string;
-  content: string;
-  postedAt: string;
-  postedBy: string;
-  postedById: string;
-  isPublic?: boolean;
-}
-
-export interface AlumniPost {
-  id: string;
-  name: string;
-  companyName: string;
-  placementDate: string; // YYYY-MM-DD
-  package?: string; // e.g., "12 LPA"
-  photoUrl: string; // A relative or absolute URL to the image
-  postedAt: string;
-  postedBy: string;
-  postedById: string;
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 import { User, UserRole } from '../types';
 import { fetchUsers, deleteUser } from '../services/apiService';
 import Button from './Button';
@@ -7,34 +7,36 @@ import Spinner from './Spinner';
 import Input from './Input';
 
 const ManageStudentsPage: React.FC = () => {
+    const { user } = useAuth();
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
-    const navigate = useNavigate();
 
     const loadUsers = useCallback(async () => {
+        if (!user) return;
         try {
             setLoading(true);
             setError(null);
-            const allUsers = await fetchUsers();
+            const allUsers = await fetchUsers(user.id);
             setUsers(allUsers.filter(u => u.role === UserRole.STUDENT));
         } catch (err: any) {
             setError(err.message || 'Failed to load users.');
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [user]);
 
     useEffect(() => {
         loadUsers();
     }, [loadUsers]);
 
     const handleRemoveUser = async (userId: string, studentName: string) => {
+        if (!user) return;
         if (window.confirm(`Are you sure you want to remove ${studentName}? This action cannot be undone.`)) {
             try {
                 setError(null);
-                await deleteUser(userId);
+                await deleteUser(userId, user.id);
                 setUsers(prevUsers => prevUsers.filter(u => u.id !== userId));
             } catch (err: any) {
                 setError(err.message || 'Failed to remove user.');
@@ -91,9 +93,6 @@ const ManageStudentsPage: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <Button onClick={() => navigate('/admin')} variant="secondary">
-                &larr; Back to Dashboard
-            </Button>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-2 border-gray-200 dark:border-gray-700">
                 <h1 className="text-2xl md:text-3xl font-bold text-text-primary dark:text-dark-text-primary">Manage Students</h1>
                 <Button onClick={handleDownloadCsv} variant="secondary">
@@ -125,10 +124,10 @@ const ManageStudentsPage: React.FC = () => {
                         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead className="bg-gray-50 dark:bg-gray-800">
                                 <tr>
-                                    <th scope="col" className="px-4 py-3 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
-                                    <th scope="col" className="px-4 py-3 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Username / Email</th>
-                                    <th scope="col" className="px-4 py-3 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Subscription</th>
-                                    <th scope="col" className="relative px-4 py-3 sm:px-6 sm:py-3">
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Username / Email</th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Subscription</th>
+                                    <th scope="col" className="relative px-6 py-3">
                                         <span className="sr-only">Actions</span>
                                     </th>
                                 </tr>
@@ -137,10 +136,10 @@ const ManageStudentsPage: React.FC = () => {
                                 {filteredStudents.length > 0 ? (
                                     filteredStudents.map((student) => (
                                         <tr key={student.id}>
-                                            <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">{student.name}</td>
-                                            <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{student.username}</td>
-                                            <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{student.subscriptionTier}</td>
-                                            <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">{student.name}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{student.username}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{student.subscriptionTier}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                 <Button onClick={() => handleRemoveUser(student.id, student.name)} variant="danger">
                                                     Remove
                                                 </Button>

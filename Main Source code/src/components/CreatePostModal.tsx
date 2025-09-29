@@ -5,7 +5,6 @@ import { DrivePost, PackageLevel } from '../types';
 import Modal from './Modal';
 import Input from './Input';
 import Button from './Button';
-import ToggleSwitch from './ToggleSwitch';
 
 interface CreatePostModalProps {
   isOpen: boolean;
@@ -61,14 +60,15 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onPo
     setFormData(prev => ({ ...prev, [id]: value }));
   };
 
-  const handleToggleChange = (checked: boolean) => {
-    setFormData(prev => ({ ...prev, isFree: checked }));
+  const handleToggleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, checked } = e.target;
+    setFormData(prev => ({ ...prev, [id]: checked }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
-        setError("User session expired. Please log in again.");
+        setError("You must be logged in to create or edit a post.");
         return;
     }
     setLoading(true);
@@ -84,9 +84,10 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onPo
           ...driveToEdit,
           ...commonData,
         };
-        await updateDrive(updatedDriveData);
+        await updateDrive(updatedDriveData, user.id);
       } else {
-        await createDrive(commonData);
+        const driveData: Omit<DrivePost, 'id' | 'postedAt' | 'postedBy' | 'postedById'> = commonData;
+        await createDrive(driveData, user);
       }
       onPostCreated();
     } catch (err: any) {
@@ -112,28 +113,34 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onPo
         <div>
           <label htmlFor="packageLevel" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Package Level</label>
            <select id="packageLevel" value={formData.packageLevel} onChange={handleChange} required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
-              <option value={PackageLevel.LOW}>Low (e.g., {'<'} 8 LPA)</option>
+              <option value={PackageLevel.LOW}>Low (e.g., &lt; 8 LPA)</option>
               <option value={PackageLevel.MID}>Mid (e.g., 8-15 LPA)</option>
-              <option value={PackageLevel.HIGH}>High (e.g., {'>'} 15 LPA)</option>
+              <option value={PackageLevel.HIGH}>High (e.g., &gt; 15 LPA)</option>
            </select>
         </div>
         <Input label="Application Deadline" id="applyDeadline" type="date" value={formData.applyDeadline} onChange={handleChange} required />
         <Input label="Application Link" id="applyLink" type="url" value={formData.applyLink} onChange={handleChange} />
         
         <div className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3 rounded-md">
-            <label htmlFor="isFree" className="block text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
+            <label htmlFor="isFree" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Drive Visibility
                 <span className="block text-xs text-gray-500 dark:text-gray-400">
                     Free drives are visible to everyone on the landing page.
                 </span>
             </label>
-            <ToggleSwitch
-                id="isFree"
-                checked={formData.isFree}
-                onChange={handleToggleChange}
-                labelOn="Free"
-                labelOff="Premium"
-            />
+            <div className="relative inline-flex items-center cursor-pointer">
+                <input
+                    type="checkbox"
+                    id="isFree"
+                    className="sr-only peer"
+                    checked={formData.isFree}
+                    onChange={handleToggleChange}
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+                <span className="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+                    {formData.isFree ? 'Free' : 'Premium'}
+                </span>
+            </div>
         </div>
 
         {error && <p className="text-red-500 text-sm font-semibold p-2 bg-red-100 dark:bg-red-900/20 rounded-md">{error}</p>}

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Button from './Button';
 import { DrivePost } from '../types';
 import { fetchDrives } from '../services/apiService';
@@ -7,7 +6,6 @@ import DriveCard from './DriveCard';
 import Spinner from './Spinner';
 import ResumeBuilderCTA from './ResumeBuilderCTA';
 import PricingTiers from './PricingTiers';
-import AnnouncementsFeed from './AnnouncementsFeed';
 
 interface LandingPageProps {
   onLoginClick: () => void;
@@ -18,14 +16,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onRegisterClick
     const [freeDrives, setFreeDrives] = useState<DrivePost[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const navigate = useNavigate();
 
     useEffect(() => {
         const loadFreeDrives = async () => {
             try {
                 setLoading(true);
                 setError(null);
-                const data = await fetchDrives('free');
+                const data = await fetchDrives('free'); // Fetch only free drives
                 setFreeDrives(data.sort((a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime()));
             } catch (err) {
                 setError('Failed to load free placement drives. Please check back later.');
@@ -37,12 +34,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onRegisterClick
         loadFreeDrives();
     }, []);
 
-    const displayedDrives = freeDrives.slice(0, 5);
-
   return (
     <div className="space-y-16">
         <div className="text-center py-10 md:py-16">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-text-primary dark:text-dark-text-primary">
+            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-text-primary dark:text-dark-text-primary">
                 Find Your Dream Placement
             </h1>
             <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-text-secondary dark:text-dark-text-secondary">
@@ -67,12 +62,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onRegisterClick
             </p>
         </div>
         
-        <AnnouncementsFeed visibility="public" />
-        
         <PricingTiers onRegisterClick={onRegisterClick} />
 
         <ResumeBuilderCTA />
 
+        {/* Free Drives Section */}
         <div id="free-drives" className="space-y-6 scroll-mt-20">
             <div className="border-b pb-2 border-gray-200 dark:border-gray-700">
                 <h2 className="text-2xl md:text-3xl font-bold text-text-primary dark:text-dark-text-primary">Free Drives</h2>
@@ -93,16 +87,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onRegisterClick
 
             {!loading && !error && (
                 freeDrives.length > 0 ? (
-                    <>
-                        {displayedDrives.map(drive => <DriveCard key={drive.id} drive={drive} />)}
-                        {freeDrives.length > 5 && (
-                            <div className="text-center mt-8">
-                                <Button onClick={() => navigate('/free-drives')} variant="secondary">
-                                    View All Free Drives
-                                </Button>
-                            </div>
-                        )}
-                    </>
+                    freeDrives.map(drive => <DriveCard key={drive.id} drive={drive} />)
                 ) : (
                     <div className="text-center text-text-secondary dark:text-dark-text-secondary py-10">
                         <p>No free drives posted at the moment. Check back soon!</p>

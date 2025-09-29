@@ -21,8 +21,7 @@ const PricingTiers: React.FC<PricingTiersProps> = ({ onRegisterClick }) => {
             Start for free and upgrade anytime to unlock exclusive placement opportunities.
           </p>
         </div>
-        <div className="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
-          
+        <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Free Tier */}
           <div className="bg-surface dark:bg-dark-surface rounded-lg shadow-lg p-8 flex flex-col">
             <h3 className="text-2xl font-semibold text-text-primary dark:text-dark-text-primary">Free</h3>
@@ -33,53 +32,34 @@ const PricingTiers: React.FC<PricingTiersProps> = ({ onRegisterClick }) => {
             <ul className="mt-6 space-y-4 flex-grow">
               <li className="flex items-start">
                 <CheckIcon />
-                <span className="ml-3 text-text-secondary dark:text-dark-text-secondary">View free placement drives</span>
+                <span className="ml-3 text-text-secondary dark:text-dark-text-secondary">Low drives</span>
               </li>
               <li className="flex items-start">
                 <CheckIcon />
-                <span className="ml-3 text-text-secondary dark:text-dark-text-secondary">Access to public announcements</span>
+                <span className="ml-3 text-text-secondary dark:text-dark-text-secondary">Low package</span>
               </li>
-              <li className="flex items-start">
+               <li className="flex items-start">
                 <CheckIcon />
-                <span className="ml-3 text-text-secondary dark:text-dark-text-secondary">Limited to smaller companies</span>
+                <span className="ml-3 text-text-secondary dark:text-dark-text-secondary">Basic / small companies</span>
+              </li>
+               <li className="flex items-start">
+                <CheckIcon />
+                <span className="ml-3 text-text-secondary dark:text-dark-text-secondary">For all participants</span>
               </li>
             </ul>
-             <div className="mt-8">
-                <Button onClick={onRegisterClick} variant="secondary" className="w-full text-lg py-3">
-                    Get Started
-                </Button>
-            </div>
           </div>
 
           {/* Premium Tier */}
-          <div className="relative bg-surface dark:bg-dark-surface rounded-lg shadow-lg p-8 flex flex-col border-2 border-primary">
+          <div className="relative bg-surface dark:bg-dark-surface rounded-lg shadow-lg p-8 flex flex-col border-2 border-amber-500">
              <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2">
-                <span className="px-4 py-1 text-sm text-white bg-primary rounded-full font-semibold">Premium</span>
+                <span className="px-4 py-1 text-sm text-white bg-amber-500 rounded-full font-semibold">Most Popular</span>
             </div>
-            <h3 className="text-2xl font-semibold text-primary">Unlock Everything</h3>
-            <p className="mt-4 text-text-secondary dark:text-dark-text-secondary">Get full access to all placement drives and features.</p>
-            
-            <div className="my-6 space-y-3">
-              <div className="flex justify-between items-center p-3 rounded-lg bg-gray-100 dark:bg-gray-800">
-                  <span className="font-semibold text-text-primary dark:text-dark-text-primary">Monthly</span>
-                  <span className="text-lg font-bold text-text-primary dark:text-dark-text-primary">₹99</span>
-              </div>
-              <div className="flex justify-between items-center p-3 rounded-lg bg-gray-100 dark:bg-gray-800 ring-2 ring-amber-500">
-                  <div>
-                    <span className="font-semibold text-text-primary dark:text-dark-text-primary">6 Months</span>
-                    <span className="ml-2 text-xs font-bold text-amber-500 bg-amber-100 dark:bg-amber-900/50 px-2 py-0.5 rounded-full">POPULAR</span>
-                  </div>
-                  <span className="text-lg font-bold text-text-primary dark:text-dark-text-primary">₹499</span>
-              </div>
-              <div className="flex justify-between items-center p-3 rounded-lg bg-gray-100 dark:bg-gray-800">
-                   <div>
-                    <span className="font-semibold text-text-primary dark:text-dark-text-primary">12 Months</span>
-                     <span className="ml-2 text-xs font-bold text-green-600 bg-green-100 dark:bg-green-900/50 px-2 py-0.5 rounded-full">BEST VALUE</span>
-                  </div>
-                  <span className="text-lg font-bold text-text-primary dark:text-dark-text-primary">₹999</span>
-              </div>
+            <h3 className="text-2xl font-semibold text-amber-500">Premium</h3>
+            <p className="mt-4 text-text-secondary dark:text-dark-text-secondary">Unlock your full potential with access to all drives.</p>
+            <div className="mt-6">
+              <span className="text-4xl font-extrabold text-text-primary dark:text-dark-text-primary">₹49</span>
+              <span className="text-base font-medium text-text-secondary dark:text-dark-text-secondary">/ one-time</span>
             </div>
-
             <ul className="mt-6 space-y-4 flex-grow">
               <li className="flex items-start">
                 <CheckIcon />
@@ -99,12 +79,16 @@ const PricingTiers: React.FC<PricingTiersProps> = ({ onRegisterClick }) => {
               </li>
                <li className="flex items-start">
                 <CheckIcon />
-                <span className="ml-3 text-text-secondary dark:text-dark-text-secondary">Generate Hall Pass for drives</span>
+                <span className="ml-3 text-text-secondary dark:text-dark-text-secondary">More placement benefits</span>
+              </li>
+               <li className="flex items-start">
+                <CheckIcon />
+                <span className="ml-3 text-text-secondary dark:text-dark-text-secondary">Provides Pass</span>
               </li>
             </ul>
             <div className="mt-8">
-              <Button onClick={onRegisterClick} variant="primary" className="w-full text-lg py-3">
-                Choose Plan on Registration
+              <Button onClick={onRegisterClick} className="w-full text-lg py-3 bg-amber-500 hover:bg-amber-600 focus:ring-amber-400 text-white">
+                Choose Premium
               </Button>
             </div>
           </div>
