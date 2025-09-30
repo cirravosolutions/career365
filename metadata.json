@@ -1,0 +1,5 @@
+{
+  "name": "Career365",
+  "description": "A centralized platform for students to view upcoming placement drives and for placement officers and HR to post new opportunities. Features a real-time feed and role-based access for administrators.",
+  "requestFramePermissions": []
+}
